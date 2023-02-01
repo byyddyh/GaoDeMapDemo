@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,6 +19,8 @@ import com.amap.api.maps.AMap;
 import com.amap.api.maps.LocationSource;
 import com.amap.api.maps.MapView;
 import com.amap.api.maps.MapsInitializer;
+import com.amap.api.maps.model.BitmapDescriptorFactory;
+import com.amap.api.maps.model.MyLocationStyle;
 import com.amap.api.services.core.ServiceSettings;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
@@ -35,6 +38,8 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
     private AMap aMap = null;
     //位置更改监听
     private LocationSource.OnLocationChangedListener mListener;
+    //定位样式
+    private MyLocationStyle myLocationStyle = new MyLocationStyle();
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -55,7 +60,6 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
 
         mapView = findViewById(R.id.map_view);
         mapView.onCreate(savedInstanceState);
-//        textView = findViewById(R.id.tv_content);
 
         // 初始化定位
         initLocation();
@@ -215,10 +219,13 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
 
                 Log.d("MainActivity", buffer);
 //                textView.setText(address == null ? "无地址": buffer);
-                showMsg(address);
+//                showMsg(address);
+
+//                aMapLocation.setLongitude(longitude + 0.01);
+//                aMapLocation.setLatitude(latitude + 0.01);
 
                 // 停止定位后，本地定位服务并不会被销毁
-                mLocationClient.stopLocation();
+//                mLocationClient.stopLocation();
 
                 // 显示地图定位结果
                 if (mListener != null) {
@@ -236,6 +243,7 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
 
     /**
      * 初始化地图
+     *
      * @param savedInstanceState
      */
     private void initMap(Bundle savedInstanceState) {
@@ -244,6 +252,20 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
         mapView.onCreate(savedInstanceState);
         //初始化地图控制器对象
         aMap = mapView.getMap();
+
+        //设置最小缩放等级为16 ，缩放级别范围为[3, 20]
+        aMap.setMinZoomLevel(18);
+        // 自定义定位蓝点图标
+        myLocationStyle.myLocationIcon(BitmapDescriptorFactory.fromResource(R.drawable.circle));
+        // 自定义精度范围的圆形边框颜色  都为0则透明
+        myLocationStyle.strokeColor(Color.argb(0, 0, 0, 0));
+        // 自定义精度范围的圆形边框宽度  0 无宽度
+        myLocationStyle.strokeWidth(0);
+        // 设置圆形的填充颜色  都为0则透明
+        myLocationStyle.radiusFillColor(Color.argb(0, 0, 0, 0));
+
+        //设置定位蓝点的Style
+        aMap.setMyLocationStyle(myLocationStyle);
 
         // 设置定位监听
         aMap.setLocationSource(this);
